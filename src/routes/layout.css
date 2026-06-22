@@ -1,0 +1,111 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/* 02 TYPOGRAPHY - GOOGLE FONTS IMPORT[cite: 1] */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap'); /*[cite: 1] */
+
+@theme {
+  /* 01 COLOR PALETTE[cite: 1] */
+  /* Backgrounds[cite: 1] */
+  --color-brand-bg: #111111; /*[cite: 1] */
+  --color-brand-surface: #141414; /*[cite: 1] */
+  --color-brand-raised: #1A1A1A; /*[cite: 1] */
+  --color-brand-sidebar: #121212; /*[cite: 1] */
+  
+  /* Borders[cite: 1] */
+  --color-brand-border-subtle: #1E1E1E; /*[cite: 1] */
+  --color-brand-border-default: #252525; /*[cite: 1] */
+  --color-brand-border-strong: #2A2A2A; /*[cite: 1] */
+  --color-brand-border-ghost: #333333; /*[cite: 1] */
+  
+  /* Accents[cite: 1] */
+  --color-accent-primary: #E8184F; /*[cite: 1] */
+  --color-accent-fill: rgba(232, 24, 79, 0.12); /* #E8184F + 12% opacity[cite: 1] */
+  --color-accent-border: rgba(232, 24, 79, 0.25); /* #E8184F + 25% opacity[cite: 1] */
+  
+  /* Text Palette[cite: 1] */
+  --color-terminal-primary: #FFFFFF; /*[cite: 1] */
+  --color-terminal-secondary: #C8C8C8; /*[cite: 1] */
+  --color-terminal-muted: #AAAAAA; /*[cite: 1] */
+  --color-terminal-dim: #888888; /*[cite: 1] */
+  --color-terminal-faint: #666666; /*[cite: 1] */
+  --color-terminal-ghost: #555555; /*[cite: 1] */
+  --color-terminal-disabled: #444444; /*[cite: 1] */
+  --color-terminal-placeholder: #333333; /*[cite: 1] */
+
+  /* 02 TYPOGRAPHY - FONT FAMILIES[cite: 1] */
+  --font-display: 'Rajdhani', sans-serif; /*[cite: 1] */
+  --font-mono-chrome: 'Share Tech Mono', monospace; /*[cite: 1] */
+
+  /* 02 TYPOGRAPHY - TYPE SCALE[cite: 1] */
+  --text-hero: 52px; /*[cite: 1] */
+  --text-display: 40px; /*[cite: 1] */
+  --text-ui-large: 17px; /*[cite: 1] */
+  --text-ui-default: 13px; /*[cite: 1] */
+  --text-ui-small: 12px; /*[cite: 1] */
+  --text-label: 11px; /* Range 10-11px[cite: 1] */
+  --text-micro: 9px; /*[cite: 1] */
+
+  /* 02 TYPOGRAPHY - LETTER SPACING[cite: 1] */
+  --tracking-hacker-label: 2.5px; /* Range 2-3px[cite: 1] */
+  --tracking-hacker-btn: 1px; /*[cite: 1] */
+  --tracking-hacker-msg: 0.3px; /*[cite: 1] */
+  --tracking-hacker-micro: 1.5px; /*[cite: 1] */
+}
+
+/* BASE APPLICATION OVERRIDES */
+@layer base {
+  html, body {
+    background-color: var(--color-brand-bg); /*[cite: 1] */
+    color: var(--color-terminal-secondary); /*[cite: 1] */
+    font-family: var(--font-mono-chrome); /*[cite: 1] */
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 03 LAYOUT & SPACING - Zero Border Radius Everywhere[cite: 1] */
+  *, ::before, ::after {
+    border-radius: 0px !important; /*[cite: 1] */
+  }
+}
+
+/* CUSTOM APP UTILITIES & ANIMATIONS */
+@layer utilities {
+  /* Dot grid tile texture[cite: 1] */
+  .bg-dot-grid {
+    background-image: radial-gradient(
+      circle at 1px 1px, 
+      rgba(255, 255, 255, 0.025) 1px, 
+      transparent 0
+    ); /*[cite: 1] */
+    background-size: 28px 28px; /*[cite: 1] */
+  }
+
+  /* 05 ANIMATIONS - Cursor blink[cite: 1] */
+  .terminal-cursor::after {
+    content: '';
+    display: inline-block;
+    width: 2px; /*[cite: 1] */
+    height: 1.2em;
+    background-color: var(--color-accent-primary); /*[cite: 1] */
+    margin-left: 4px;
+    vertical-align: middle;
+    animation: cursor-blink 1s step-end infinite; /*[cite: 1] */
+  }
+
+  /* 05 ANIMATIONS - Status dot opacity pulse[cite: 1] */
+  .animate-status-pulse {
+    animation: status-pulse 2s ease infinite; /*[cite: 1] */
+  }
+}
+
+/* KEYFRAMES FOR SPECCED ANIMATIONS[cite: 1] */
+@keyframes cursor-blink {
+  from, to { background-color: transparent; }
+  50% { background-color: var(--color-accent-primary); } /*[cite: 1] */
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; } /*[cite: 1] */
+  50% { opacity: 0.3; } /*[cite: 1] */
+}
