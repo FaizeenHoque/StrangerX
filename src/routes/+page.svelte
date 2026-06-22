@@ -11,12 +11,6 @@
 </script>
 
 <div class="min-h-screen flex flex-col">
-    <div class="w-full border-b-2 border-accent-primary p-4">
-        <h1 class="font-mono-chrome font-thin text-2xl sm:text-4xl">
-            STRANGER<span class="text-accent-primary">X</span>_
-        </h1>
-    </div>
-
     <div class="flex-1 flex flex-col md:flex-row">
         <!-- LEFT PANEL -->
         <div class="w-full md:w-1/2 border-b-2 md:border-b-0 md:border-r-2 border-accent-primary flex flex-col justify-center items-center py-12 px-6">

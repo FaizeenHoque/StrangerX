@@ -47,5 +47,7 @@ export const GET = async ({ url, fetch, cookies }) => {
         path: "/"
     });
 
-    throw redirect(302, "/");
+    console.log("Token saved.")
+
+    throw redirect(302, "/matchmaking");
 };
