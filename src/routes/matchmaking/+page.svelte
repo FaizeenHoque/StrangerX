@@ -1,13 +1,69 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
+    import { io, type Socket } from 'socket.io-client';
 
     let scanning = $state(false);
     let blip1 = $state(false);
     let blip2 = $state(false);
     let blip3 = $state(false);
 
+    let matched = $state(false);
+    let currentMessage = $state('');
+    let chatting = $state(false);
+    let roomID = $state('');
+
+    let inQueue = $state(0);
+
+    type Message = {
+        sender: 'stranger' | 'you' | 'system';
+        text: string;
+    };
+
+    let messages = $state<Message[]>([
+        {
+            sender: 'system',
+            text: '// CONNECTION ESTABLISHED — BEGIN TRANSMISSION'
+        }
+    ]);
+
+    let socket: Socket;
+
+    onMount(() => {
+        socket = io('http://localhost:3001')
+
+        socket.on('matched', (data: { roomID: string }) => {
+            roomID = data.roomID;
+            matched = true;
+            stopScan();
+        })
+
+        socket.on('message', (message: string) => {
+            console.log('message from stranger: ', message);
+
+            messages.push({
+                sender: 'stranger',
+                text: message
+            });
+        })
+
+        socket.on('queue_update', (count: number) => {
+            inQueue = count;
+        });
+
+        socket.on('partner_disconnected', () => {
+            messages.push({
+                sender: 'system',
+                text: '// STRANGER DISCONNECTED'
+            })
+        })
+        
+    })
+
+    onDestroy(() => socket?.disconnect());
+
     export function startScan() {
         scanning = true;
+        socket.emit('join_queue');
         setTimeout(() => blip1 = true, 800);
         setTimeout(() => blip2 = true, 1600);
         setTimeout(() => blip3 = true, 2400);
@@ -15,9 +71,21 @@
 
     export function stopScan() {
         scanning = false;
+        socket.emit('leave_queue');
         blip1 = false;
         blip2 = false;
         blip3 = false;
+    }
+
+    function sendMessage(message: string) {
+        if (!message.trim()) return;
+
+        messages.push({
+            sender: 'you',
+            text: message
+        });
+
+        socket.emit('send_message', { roomID, message });
     }
 </script>
 
@@ -102,7 +170,7 @@
                     <p class="font-mono text-[9px] tracking-[2px] text-[#333] mt-1">ONLINE</p>
                 </div>
                 <div class="flex-1 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center min-w-0">
-                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">47</p>
+                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">{inQueue}</p>
                     <p class="font-mono text-[9px] tracking-[2px] text-[#333] mt-1">IN QUEUE</p>
                 </div>
                 <div class="flex-1 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center min-w-0">
@@ -114,9 +182,9 @@
             <!-- FIND BUTTON -->
             <button
                 class="w-full max-w-sm border-white mt-2 mb-2 border p-2 hover:cursor-pointer hover:bg-accent-primary hover:text-brand-bg"
-                on:click={startScan}
+                onclick={scanning ? stopScan : startScan}
             >
-                [FIND A STRANGER]
+                { scanning ? '[STOP SEARCH]' : '[FIND A STRANGER]' }
             </button>
 
             <!-- TERMINAL LOG -->
@@ -128,4 +196,145 @@
             </div>
         </div>
     </div>
+
+
+    {#if matched}
+    <div class="fixed inset-0 flex items-center justify-center z-50 bg-black/70">
+        <div class="bg-brand-surface border border-accent-primary p-8 flex flex-col items-center gap-4">
+            <p class="font-mono text-[10px] tracking-[3px] text-[#333]">MATCH FOUND</p>
+            <p class="font-display text-4xl font-bold text-white">CONNECTED</p>
+            <p class="font-mono text-[11px] tracking-[1px] text-[#444]">A STRANGER HAS BEEN FOUND</p>
+            <button 
+                class="w-full border border-white p-2 font-mono text-sm hover:bg-accent-primary hover:text-brand-bg hover:cursor-pointer"
+                onclick={() => { matched=false; chatting=true; }}>
+                [START CHATTING]
+            </button>
+        </div>
+    </div>
+    {/if}
+
+
+    {#if chatting}
+    <div class="fixed inset-0 z-50 bg-brand-bg flex flex-col font-mono">
+
+        <!-- Header -->
+        <div class="h-16 border-b border-accent-primary flex items-center justify-between px-6">
+
+            <div>
+                <p class="text-ui-small text-gray-500">
+                    &gt; SESSION ACTIVE
+                </p>
+
+                <p class="text-accent-primary text-sm font-bold">
+                    ▪ STRANGER_7F2A
+                </p>
+            </div>
+
+            <button
+                class="border border-white px-5 py-2 text-sm hover:bg-accent-primary hover:text-brand-bg cursor-pointer"
+                onclick={() => {
+                    chatting = false;
+                    socket.disconnect();
+                }}
+            >
+                [DISCONNECT]
+            </button>
+
+        </div>
+
+
+        <!-- Chat area -->
+        <div class="flex-1 p-6 overflow-y-auto flex flex-col gap-8" id="chatarea">
+
+        {#each messages as msg}
+
+            {#if msg.sender === 'system'}
+                <p class="text-gray-600 text-center text-xs">
+                    {msg.text}
+                </p>
+
+            {:else if msg.sender === 'stranger'}
+                <div>
+                    <p class="text-gray-500 text-xs mb-2">
+                        STRANGER
+                    </p>
+
+                    <p class="inline-block border border-gray-700 p-3 text-white">
+                        {msg.text}
+                    </p>
+                </div>
+
+            {:else}
+                <div class="flex justify-end">
+                    <div>
+                        <p class="text-gray-500 text-xs mb-2 text-right">
+                            YOU
+                        </p>
+
+                        <p class="inline-block border border-gray-700 p-3 text-white">
+                            {msg.text}
+                        </p>
+                    </div>
+                </div>
+
+            {/if}
+
+        {/each}
+
+    </div>
+
+
+        <!-- Input area -->
+        <div class="border-t border-gray-600 p-3 flex gap-3">
+
+            <input
+                bind:value={currentMessage}
+                type="text"
+                placeholder="TYPE A MESSAGE..."
+                class="flex-1 bg-brand-bg border border-white p-3 text-white font-mono outline-none focus:border-accent-primary"
+                onkeydown={(e) => {
+                    if (e.key === 'Enter') {
+                        sendMessage(currentMessage);
+                        currentMessage = '';
+                    }
+                }}
+            />
+
+            <button
+                onclick={() => {
+                    sendMessage(currentMessage);
+                    currentMessage = '';
+                }}
+                class="border border-white px-8 hover:bg-accent-primary hover:text-brand-bg cursor-pointer"
+            >
+                [SEND]
+            </button>
+
+        </div>
+
+
+        <!-- Quick replies -->
+        <div class="border-t border-gray-700 p-3 flex gap-4 items-center">
+
+            <span class="text-gray-500 text-xs">
+                QUICK
+            </span>
+
+            <button class="border border-gray-600 px-5 py-2">
+                as!?
+            </button>
+
+            <button class="border border-gray-600 px-5 py-2">
+                LoL
+            </button>
+
+            <button class="border border-gray-600 px-5 py-2">
+                next?
+            </button>
+
+        </div>
+
+    </div>
+    {/if}
+
 </div>
