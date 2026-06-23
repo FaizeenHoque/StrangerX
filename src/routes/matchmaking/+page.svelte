@@ -12,7 +12,7 @@
     let chatting = $state(false);
     let roomID = $state('');
 
-    let inQueue = $state(0);
+    let stats = $state({ online: 0, queue: 0, chats: 0 });
 
     type Message = {
         sender: 'stranger' | 'you' | 'system';
@@ -46,8 +46,8 @@
             });
         })
 
-        socket.on('queue_update', (count: number) => {
-            inQueue = count;
+        socket.on('stats_update', (data: { online: number; queue: number; chats: number }) => {
+            stats = data;
         });
 
         socket.on('partner_disconnected', () => {
@@ -166,15 +166,15 @@
             <!-- STATS ROW -->
             <div class="flex w-full max-w-sm gap-px">
                 <div class="flex-1 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center min-w-0">
-                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">1,284</p>
+                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">{stats.online}</p>
                     <p class="font-mono text-[9px] tracking-[2px] text-[#333] mt-1">ONLINE</p>
                 </div>
                 <div class="flex-1 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center min-w-0">
-                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">{inQueue}</p>
+                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">{stats.queue}</p>
                     <p class="font-mono text-[9px] tracking-[2px] text-[#333] mt-1">IN QUEUE</p>
                 </div>
                 <div class="flex-1 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center min-w-0">
-                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">392</p>
+                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">{stats.chats}</p>
                     <p class="font-mono text-[9px] tracking-[2px] text-[#333] mt-1">ACTIVE CHATS</p>
                 </div>
             </div>

@@ -11,7 +11,13 @@ const io = new Server(httpServer, {
 const queue: string[] = [];
 const socketToRoom = new Map<string, string>();
 
+let online_count = 0;
+let activeChats = 0;
+
 io.on('connection', (socket) => {
+  online_count++;
+  io.emit('stats_update', { online: online_count, queue: queue.length, chats: activeChats })
+  
   console.log('client connected:', socket.id);
 
   socket.on('join_queue', (data: string) => {
@@ -25,18 +31,21 @@ io.on('connection', (socket) => {
         socketToRoom.set(socket.id, roomID);
         socketToRoom.set(partnerID, roomID);
 
+        
+        activeChats++;
+        io.emit('stats_update', { online: online_count, queue: queue.length, chats: activeChats })
         io.to(roomID).emit('matched', { roomID });
     } else {
         queue.push(socket.id);
     }
 
-    io.emit('queue_update', queue.length); 
+    io.emit('stats_update', { online: online_count, queue: queue.length, chats: activeChats })
   });
 
   socket.on('leave_queue', () => {
     const idx = queue.indexOf(socket.id);
     if (idx !== -1) queue.splice(idx, 1);
-    io.emit('queue_update', queue.length); 
+    io.emit('stats_update', { online: online_count, queue: queue.length, chats: activeChats })
   });
 
   socket.on('send_message', ({ roomID, message }: { roomID: string; message: string }) => {
@@ -48,15 +57,24 @@ io.on('connection', (socket) => {
     const roomID = socketToRoom.get(socket.id);
 
     if (roomID) {
-      socket.to(roomID).emit('partner_disconnected');
+        socket.to(roomID).emit('partner_disconnected');
+        socketToRoom.delete(socket.id);
 
-      socketToRoom.delete(socket.id);
+        // Only decrement if the OTHER person is still mapped to this room
+        // i.e. we're the first to leave
+        const roomStillActive = [...socketToRoom.values()].includes(roomID);
+        if (!roomStillActive) {
+            activeChats--;
+        }
+
+        io.emit('stats_update', { online: online_count, queue: queue.length, chats: activeChats });
     }
 
     const idx = queue.indexOf(socket.id);
     if (idx !== -1) queue.splice(idx, 1);
 
-    io.emit('queue_update', queue.length);
+    online_count--;
+    io.emit('stats_update', { online: online_count, queue: queue.length, chats: activeChats });
   });
 });
 
