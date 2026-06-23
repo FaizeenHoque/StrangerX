@@ -43,7 +43,7 @@ export const GET = async ({ url, fetch, cookies }) => {
 
     cookies.set("refresh_token", data.refresh_token, {
         httpOnly: true,
-        secure: true,
+        secure: false,
         path: "/"
     });
 
