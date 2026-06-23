@@ -1,10 +1,14 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import 'dotenv/config'; 
+
+const SITEURL = process.env.SITEURL;
+if (!SITEURL) throw new Error('SITEURL env var is not set');
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: 'https://strangerx.vercel.app/' 
+    origin: SITEURL
   }
 });
 

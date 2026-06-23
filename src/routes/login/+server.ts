@@ -1,8 +1,14 @@
 import { HACKCLUB_AUTH_CLIENT_ID } from "$env/static/private";
 import { redirect } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
+import { HACKCLUB_REDIRECT_URI } from "$env/static/private";
 
-export const GET = () => {
-    const url = `https://auth.hackclub.com/oauth/authorize?client_id=${HACKCLUB_AUTH_CLIENT_ID}&redirect_uri=https://strangerx.vercel.app/oauth/callback&response_type=code&scope=email profile`;
+export const GET: RequestHandler = () => {
+    const url = new URL("https://auth.hackclub.com/oauth/authorize");
+    url.searchParams.set("client_id", HACKCLUB_AUTH_CLIENT_ID);
+    url.searchParams.set("redirect_uri", HACKCLUB_REDIRECT_URI);
+    url.searchParams.set("response_type", "code");
+    url.searchParams.set("scope", "email profile");
 
-    throw redirect(302, url);
+    throw redirect(302, url.toString());
 };
