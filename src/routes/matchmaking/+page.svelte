@@ -316,20 +316,24 @@
         <!-- Quick replies -->
         <div class="border-t border-gray-700 p-3 flex gap-4 items-center">
 
-            <span class="text-gray-500 text-xs">
-                QUICK
+            <span class="text-gray-500 text-xs" >
+                Quick Chat
             </span>
 
-            <button class="border border-gray-600 px-5 py-2">
-                as!?
+            <button class="border border-gray-600 px-5 py-2" onclick={() => {sendMessage("Hey!")}}>
+                Hey!
             </button>
 
-            <button class="border border-gray-600 px-5 py-2">
-                LoL
+            <button class="border border-gray-600 px-5 py-2" onclick={() => {sendMessage("Hru?")}}>
+                Hru?
             </button>
 
-            <button class="border border-gray-600 px-5 py-2">
-                next?
+            <button class="border border-gray-600 px-5 py-2" onclick={() => {sendMessage("Wyf?")}}>
+                Wyf?
+            </button>
+
+            <button class="border border-gray-600 px-5 py-2" onclick={() => {sendMessage("Wyd?")}}>
+                Wyd?
             </button>
 
         </div>
