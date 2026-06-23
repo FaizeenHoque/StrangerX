@@ -36,14 +36,14 @@ export const GET = async ({ url, fetch, cookies }) => {
 
     cookies.set("access_token", data.access_token, {
         httpOnly: true,
-        secure: false, // set true in production (HTTPS)
+        secure: true, // set true in production (HTTPS)
         path: "/",
         maxAge: data.expires_in
     });
 
     cookies.set("refresh_token", data.refresh_token, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         path: "/"
     });
 
