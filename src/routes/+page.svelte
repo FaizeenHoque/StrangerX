@@ -8,6 +8,10 @@
     function loginWithHackclub() {
         window.location.href = "/login";
     }
+
+    function guestlogin() {
+        window.location.href = "/guestlogin"
+    }
 </script>
 
 <div class="min-h-screen flex flex-col">
@@ -40,10 +44,10 @@
                 <button class="w-full border-white border-2 p-2 hover:cursor-pointer hover:bg-accent-primary hover:text-brand-bg" onclick={loginWithHackclub}>
                     [LOGIN WITH HACKCLUB]
                 </button>
-                <p class="text-terminal-dim mt-4 mb-4 text-center text-[10px]">(too lazy to implement guest)</p>
-                <!-- <button class="w-full border-white border-2 p-2 hover:cursor-pointer hover:bg-accent-primary hover:text-brand-bg">
+                <p class="text-terminal-dim mt-4 mb-4 text-center text-[10px]">or</p>
+                <button class="w-full border-white border-2 p-2 hover:cursor-pointer hover:bg-accent-primary hover:text-brand-bg" onclick={guestlogin}>
                     [LOGIN AS A GUEST]
-                </button>  -->
+                </button> 
                 <p class="text-terminal-dim mt-4 mb-4 text-center text-sm">
                     HACKCLUB LOGIN SAVES YOUR SESSION. GUESTS GET A RANDOM ID, NO HISTORY.
                 </p>
