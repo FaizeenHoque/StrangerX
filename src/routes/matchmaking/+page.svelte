@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
     import { io, type Socket } from 'socket.io-client';
+    import { SERVERURL } from "$env/static/private";
 
     let scanning = $state(false);
     let blip1 = $state(false);
@@ -29,7 +30,7 @@
     let socket: Socket;
 
     onMount(() => {
-        socket = io('http://localhost:3001')
+        socket = io(SERVERURL)
 
         socket.on('matched', (data: { roomID: string }) => {
             roomID = data.roomID;
