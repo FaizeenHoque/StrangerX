@@ -2,6 +2,10 @@
     import { onMount, onDestroy } from 'svelte';
     import { io, type Socket } from 'socket.io-client';
     import { PUBLIC_SERVERURL } from "$env/static/public";
+    import { marked } from 'marked';
+    import { emojify } from 'node-emoji';
+
+    marked.setOptions({ breaks: true });
 
     let scanning = $state(false);
     let blip1 = $state(false);
@@ -12,6 +16,11 @@
     let currentMessage = $state('');
     let chatting = $state(false);
     let roomID = $state('');
+
+    let strangerID = $state('');
+    function generateID() {
+        return Math.random().toString(16).slice(2, 6).toUpperCase();
+    }
 
     let stats = $state({ online: 0, queue: 0, chats: 0 });
 
@@ -37,6 +46,7 @@
             matched = true;
             stopScan();
             playMatchSound();
+            strangerID = generateID();
         })
 
         socket.on('message', (message: string) => {
@@ -90,6 +100,9 @@
         });
 
         socket.emit('send_message', { roomID, message });
+
+        const el = document.querySelector('textarea');
+        if (el) el.style.height = 'auto';
     }
 
     function autoscroll(node: HTMLElement) {
@@ -123,6 +136,12 @@
         g.gain.setValueAtTime(0.15, ctx.currentTime);
         g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
         o.start(); o.stop(ctx.currentTime + 0.2);
+    }
+
+    function parseMarkdown(text: string): string {
+        const emojified = emojify(text);
+        const raw = marked.parse(emojified) as string;
+        return raw;
     }
 </script>
 
@@ -188,7 +207,7 @@
                     > { scanning ? 'SCANNING FOR STRANGERS' : 'MATCHMAKING ENGINE' }
                 </p>
                 <p class="font-display text-3xl sm:text-4xl font-bold text-white leading-none mb-1">
-                    { scanning ? 'SCANNING' : 'READY' }<span class="inline-block w-0.5 h-[0.9em] bg-[#e8184f] ml-0.5 align-middle animate-blink"></span>
+                    { scanning ? 'SCANNING' : 'READY' }<span class="terminal-cursor"></span>
                 </p>
                 <p class="font-mono text-[11px] tracking-[1px] text-[#444]">
                     { scanning ? 'LOOKING FOR A MATCH...' : 'PRESS FIND TO START SCANNING' }
@@ -263,7 +282,7 @@
                 </p>
 
                 <p class="text-accent-primary text-sm font-bold">
-                    ▪ STRANGER_7F2A
+                    ▪ STRANGER_{strangerID}
                 </p>
             </div>
 
@@ -272,6 +291,7 @@
                 onclick={() => {
                     chatting = false;
                     socket.disconnect();
+                    window.location.href = "/matchmaking"
                 }}
             >
                 [DISCONNECT]
@@ -296,8 +316,8 @@
                         STRANGER
                     </p>
 
-                    <p class="inline-block border border-gray-700 p-3 text-white">
-                        {msg.text}
+                    <p class="inline-block border border-gray-700 p-3 text-white prose prose-invert prose-sm">
+                        {@html parseMarkdown(msg.text)}
                     </p>
                 </div>
 
@@ -308,8 +328,8 @@
                             YOU
                         </p>
 
-                        <p class="inline-block border border-gray-700 p-3 text-white">
-                            {msg.text}
+                        <p class="inline-block border border-gray-700 p-3 text-white prose prose-invert prose-sm">
+                            {@html parseMarkdown(msg.text)}
                         </p>
                     </div>
                 </div>
@@ -324,16 +344,22 @@
         <!-- Input area -->
         <div class="border-t border-gray-600 p-3 flex gap-3">
 
-            <input
+            <textarea
                 bind:value={currentMessage}
-                type="text"
                 placeholder="TYPE A MESSAGE..."
-                class="flex-1 bg-brand-bg border border-white p-3 text-white font-mono outline-none focus:border-accent-primary"
+                rows="1"
+                class="flex-1 bg-brand-bg border border-white p-3 text-white font-mono outline-none focus:border-accent-primary resize-none overflow-hidden"
                 onkeydown={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
                         sendMessage(currentMessage);
                         currentMessage = '';
                     }
+                }}
+                oninput={(e) => {
+                    const el = e.currentTarget;
+                    el.style.height = 'auto';
+                    el.style.height = el.scrollHeight + 'px';
                 }}
             />
 
@@ -357,19 +383,19 @@
                 Quick Chat
             </span>
 
-            <button class="border border-gray-600 px-5 py-2" onclick={() => {sendMessage("Hey!")}}>
+            <button class="border border-gray-600 px-5 py-2 hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Hey!")}}>
                 Hey!
             </button>
 
-            <button class="border border-gray-600 px-5 py-2" onclick={() => {sendMessage("Hru?")}}>
+            <button class="border border-gray-600 px-5 py-2 hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Hru?")}}>
                 Hru?
             </button>
 
-            <button class="border border-gray-600 px-5 py-2" onclick={() => {sendMessage("Wyf?")}}>
+            <button class="border border-gray-600 px-5 py-2 hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Wyf?")}}>
                 Wyf?
             </button>
 
-            <button class="border border-gray-600 px-5 py-2" onclick={() => {sendMessage("Wyd?")}}>
+            <button class="border border-gray-600 px-5 py-2 hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Wyd?")}}>
                 Wyd?
             </button>
 
