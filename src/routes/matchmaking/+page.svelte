@@ -145,7 +145,16 @@
     }
 </script>
 
-<div class="min-h-[calc(100vh-74px)] md:h-[calc(100vh-74px)] flex flex-col md:overflow-hidden">
+<!-- FIX: overflow-x-hidden + w-full prevent any child from causing horizontal scroll -->
+<div class="min-h-[calc(100vh)] md:h-[calc(100vh-74px)] flex flex-col md:overflow-hidden overflow-x-hidden w-full">
+    <div class="w-full border-b-2 border-accent-primary p-4 flex items-center justify-between">
+        <h1 class="font-mono-chrome font-thin text-2xl sm:text-4xl">
+            STRANGER<span class="text-accent-primary">X</span>_
+        </h1>
+        <a href="/logout" class="font-mono-chrome text-sm border border-accent-primary text-accent-primary px-3 py-1 hover:bg-accent-primary hover:text-white transition-colors">
+            LOGOUT
+        </a>
+    </div>
     <div class="flex-1 flex flex-col md:flex-row md:min-h-0">
 
         <!-- LEFT PANEL -->
@@ -220,17 +229,18 @@
         <div class="w-full md:w-1/2 flex flex-col justify-center items-center gap-4 px-4 sm:px-6 py-8">
 
             <!-- STATS ROW -->
+            <!-- FIX: added min-w-0 to each cell so they can shrink; reduced text size on xs -->
             <div class="flex w-full max-w-sm gap-px">
-                <div class="flex-1 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center min-w-0">
-                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">{stats.online}</p>
+                <div class="flex-1 min-w-0 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center">
+                    <p class="font-display text-xl sm:text-3xl font-bold text-[#e8184f] leading-none truncate">{stats.online}</p>
                     <p class="font-mono text-[9px] tracking-[2px] text-[#333] mt-1">ONLINE</p>
                 </div>
-                <div class="flex-1 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center min-w-0">
-                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">{stats.queue}</p>
+                <div class="flex-1 min-w-0 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center">
+                    <p class="font-display text-xl sm:text-3xl font-bold text-[#e8184f] leading-none truncate">{stats.queue}</p>
                     <p class="font-mono text-[9px] tracking-[2px] text-[#333] mt-1">IN QUEUE</p>
                 </div>
-                <div class="flex-1 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center min-w-0">
-                    <p class="font-display text-2xl sm:text-3xl font-bold text-[#e8184f] leading-none">{stats.chats}</p>
+                <div class="flex-1 min-w-0 bg-brand-surface border border-[#1e1e1e] p-3 sm:p-4 text-center">
+                    <p class="font-display text-xl sm:text-3xl font-bold text-[#e8184f] leading-none truncate">{stats.chats}</p>
                     <p class="font-mono text-[9px] tracking-[2px] text-[#333] mt-1">ACTIVE CHATS</p>
                 </div>
             </div>
@@ -256,14 +266,29 @@
 
     {#if matched}
     <div class="fixed inset-0 flex items-center justify-center z-50 bg-black/70">
-        <div class="bg-brand-surface border border-accent-primary p-8 flex flex-col items-center gap-4">
+        <div class="bg-brand-surface border border-accent-primary p-8 flex flex-col items-center gap-4 mx-4 w-full max-w-sm">
             <p class="font-mono text-[10px] tracking-[3px] text-[#333]">MATCH FOUND</p>
             <p class="font-display text-4xl font-bold text-white">CONNECTED</p>
             <p class="font-mono text-[11px] tracking-[1px] text-[#444]">A STRANGER HAS BEEN FOUND</p>
+
             <button 
                 class="w-full border border-white p-2 font-mono text-sm hover:bg-accent-primary hover:text-brand-bg hover:cursor-pointer"
-                onclick={() => { matched=false; chatting=true; }}>
+                onclick={() => { 
+                    matched = false; 
+                    chatting = true; 
+                }}>
                 [START CHATTING]
+            </button>
+
+            <button 
+                class="w-full border border-red-500 text-red-500 p-2 font-mono text-sm hover:bg-red-500 hover:text-black hover:cursor-pointer"
+                onclick={() => {
+                    matched = false;
+                    socket.disconnect();
+                    roomID = '';
+                    window.location.href = "/matchmaking";
+                }}>
+                [DECLINE]
             </button>
         </div>
     </div>
@@ -271,23 +296,24 @@
 
 
     {#if chatting}
-    <div class="fixed inset-0 z-50 bg-brand-bg flex flex-col font-mono">
+    <!-- FIX: overflow-x-hidden on the chat overlay too -->
+    <div class="fixed inset-0 z-50 bg-brand-bg flex flex-col font-mono overflow-x-hidden">
 
         <!-- Header -->
-        <div class="h-16 border-b border-accent-primary flex items-center justify-between px-6">
+        <div class="h-16 border-b border-accent-primary flex items-center justify-between px-4 sm:px-6 shrink-0">
 
-            <div>
-                <p class="text-ui-small text-gray-500">
+            <div class="min-w-0 mr-4">
+                <p class="text-ui-small text-gray-500 text-xs">
                     &gt; SESSION ACTIVE
                 </p>
 
-                <p class="text-accent-primary text-sm font-bold">
+                <p class="text-accent-primary text-sm font-bold truncate">
                     ▪ STRANGER_{strangerID}
                 </p>
             </div>
 
             <button
-                class="border border-white px-5 py-2 text-sm hover:bg-accent-primary hover:text-brand-bg cursor-pointer"
+                class="shrink-0 border border-white px-4 py-2 text-sm hover:bg-accent-primary hover:text-brand-bg cursor-pointer"
                 onclick={() => {
                     chatting = false;
                     socket.disconnect();
@@ -301,34 +327,35 @@
 
 
         <!-- Chat area -->
-        <div use:autoscroll class="flex-1 p-6 overflow-y-auto flex flex-col gap-8" id="chatarea">
+        <div use:autoscroll class="flex-1 p-4 sm:p-6 overflow-y-auto flex flex-col gap-8 min-w-0" id="chatarea">
 
         {#each messages as msg}
 
             {#if msg.sender === 'system'}
-                <p class="text-gray-600 text-center text-xs">
+                <p class="text-gray-600 text-center text-xs break-words">
                     {msg.text}
                 </p>
 
             {:else if msg.sender === 'stranger'}
-                <div>
+                <!-- FIX: min-w-0 + max-w-[85%] keep bubbles from stretching past viewport -->
+                <div class="min-w-0 max-w-[85%]">
                     <p class="text-gray-500 text-xs mb-2">
                         STRANGER
                     </p>
 
-                    <p class="inline-block border border-gray-700 p-3 text-white prose prose-invert prose-sm">
+                    <p class="inline-block border border-gray-700 p-3 text-white prose prose-invert prose-sm break-words">
                         {@html parseMarkdown(msg.text)}
                     </p>
                 </div>
 
             {:else}
-                <div class="flex justify-end">
-                    <div>
+                <div class="flex justify-end min-w-0">
+                    <div class="min-w-0 max-w-[85%]">
                         <p class="text-gray-500 text-xs mb-2 text-right">
                             YOU
                         </p>
 
-                        <p class="inline-block border border-gray-700 p-3 text-white prose prose-invert prose-sm">
+                        <p class="inline-block border border-gray-700 p-3 text-white prose prose-invert prose-sm break-words">
                             {@html parseMarkdown(msg.text)}
                         </p>
                     </div>
@@ -342,13 +369,14 @@
 
 
         <!-- Input area -->
-        <div class="border-t border-gray-600 p-3 flex gap-3">
+        <!-- FIX: min-w-0 on container; min-w-0 on textarea so it can shrink -->
+        <div class="border-t border-gray-600 p-3 flex gap-3 min-w-0 shrink-0">
 
             <textarea
                 bind:value={currentMessage}
                 placeholder="TYPE A MESSAGE..."
                 rows="1"
-                class="flex-1 bg-brand-bg border border-white p-3 text-white font-mono outline-none focus:border-accent-primary resize-none overflow-hidden"
+                class="flex-1 min-w-0 bg-brand-bg border border-white p-3 text-white font-mono outline-none focus:border-accent-primary resize-none overflow-hidden"
                 onkeydown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -368,7 +396,7 @@
                     sendMessage(currentMessage);
                     currentMessage = '';
                 }}
-                class="border border-white px-8 hover:bg-accent-primary hover:text-brand-bg cursor-pointer"
+                class="shrink-0 border border-white px-5 sm:px-8 hover:bg-accent-primary hover:text-brand-bg cursor-pointer"
             >
                 [SEND]
             </button>
@@ -377,25 +405,26 @@
 
 
         <!-- Quick replies -->
-        <div class="border-t border-gray-700 p-3 flex gap-4 items-center">
+        <!-- FIX: flex-wrap so buttons wrap on small screens instead of overflowing -->
+        <div class="border-t border-gray-700 p-3 flex gap-2 items-center flex-wrap shrink-0">
 
-            <span class="text-gray-500 text-xs" >
+            <span class="text-gray-500 text-xs">
                 Quick Chat
             </span>
 
-            <button class="border border-gray-600 px-5 py-2 hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Hey!")}}>
+            <button class="border border-gray-600 px-3 py-1.5 text-sm hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Hey!")}}>
                 Hey!
             </button>
 
-            <button class="border border-gray-600 px-5 py-2 hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Hru?")}}>
+            <button class="border border-gray-600 px-3 py-1.5 text-sm hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Hru?")}}>
                 Hru?
             </button>
 
-            <button class="border border-gray-600 px-5 py-2 hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Wyf?")}}>
+            <button class="border border-gray-600 px-3 py-1.5 text-sm hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Wyf?")}}>
                 Wyf?
             </button>
 
-            <button class="border border-gray-600 px-5 py-2 hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Wyd?")}}>
+            <button class="border border-gray-600 px-3 py-1.5 text-sm hover:cursor-pointer hover:bg-accent-primary" onclick={() => {sendMessage("Wyd?")}}>
                 Wyd?
             </button>
 
