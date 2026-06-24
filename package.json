@@ -15,6 +15,16 @@
 		"lint": "prettier --check .",
 		"format": "prettier --write ."
 	},
+	"dependencies": {
+		"dompurify": "^3.4.11",
+		"dotenv": "^17.4.2",
+		"marked": "^18.0.5",
+		"node-emoji": "^2.2.0",
+		"socket.io": "^4.8.3",
+		"socket.io-client": "^4.8.3",
+		"tsx": "^4.22.4",
+		"typescript": "^6.0.3"
+	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/adapter-node": "^5.5.6",
@@ -33,16 +43,6 @@
 		"svelte": "^5.56.1",
 		"svelte-check": "^4.6.0",
 		"tailwindcss": "^4.3.0",
-		"tsx": "^4.22.4",
-		"typescript": "^6.0.3",
 		"vite": "^8.0.16"
-	},
-	"dependencies": {
-		"dompurify": "^3.4.11",
-		"dotenv": "^17.4.2",
-		"marked": "^18.0.5",
-		"node-emoji": "^2.2.0",
-		"socket.io": "^4.8.3",
-		"socket.io-client": "^4.8.3"
 	}
 }
