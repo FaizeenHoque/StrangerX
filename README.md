@@ -1,42 +1,64 @@
-# sv
+# StrangerX
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A real-time anonymous chat application that lets users connect and chat with strangers instantly.
 
-## Creating a project
+Built with a modern full-stack architecture using SvelteKit for the frontend and a TypeScript Socket.IO backend.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
-```sh
-# create a new project
-npx sv create my-app
+* Real-time messaging
+* Anonymous stranger matching
+* WebSocket-based communication
+* Responsive interface
+* Full-stack TypeScript
+
+## Tech Stack
+
+**Frontend**
+
+* SvelteKit
+* Vite
+* Tailwind CSS
+
+**Backend**
+
+* Node.js
+* TypeScript
+* Socket.IO
+
+## Run Locally
+
+Clone the repository:
+
+```bash
+git clone https://github.com/FaizeenHoque/StrangerX.git
+cd StrangerX
 ```
 
-To recreate this project with the same configuration:
+Install dependencies:
 
-```sh
-# recreate this project
-npx sv@0.16.1 create --template minimal --types ts --add prettier tailwindcss="plugins:typography,forms" --install npm .
+```bash
+npm install
 ```
 
-## Developing
+Start development:
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
+```bash
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+## Project Structure
 
-To create a production version of your app:
-
-```sh
-npm run build
+```
+StrangerX/
+├── src/          # Frontend
+├── server.ts    # Socket.IO backend
+└── package.json
 ```
 
-You can preview the production build with `npm run preview`.
+## Author
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Faizeen Hoque
+
+GitHub:
+https://github.com/FaizeenHoque
