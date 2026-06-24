@@ -6,9 +6,12 @@
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-<div class="w-full border-b-2 border-accent-primary p-4">
+<div class="w-full border-b-2 border-accent-primary p-4 flex items-center justify-between">
 	<h1 class="font-mono-chrome font-thin text-2xl sm:text-4xl">
 		STRANGER<span class="text-accent-primary">X</span>_
 	</h1>
+	<a href="/logout" class="font-mono-chrome text-sm border border-accent-primary text-accent-primary px-3 py-1 hover:bg-accent-primary hover:text-white transition-colors">
+		LOGOUT
+	</a>
 </div>
 {@render children()}
