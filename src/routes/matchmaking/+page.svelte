@@ -36,6 +36,7 @@
             roomID = data.roomID;
             matched = true;
             stopScan();
+            playMatchSound();
         })
 
         socket.on('message', (message: string) => {
@@ -45,6 +46,8 @@
                 sender: 'stranger',
                 text: message
             });
+
+            playMessageSound();
         })
 
         socket.on('stats_update', (data: { online: number; queue: number; chats: number }) => {
@@ -87,6 +90,39 @@
         });
 
         socket.emit('send_message', { roomID, message });
+    }
+
+    function autoscroll(node: HTMLElement) {
+        const observer = new MutationObserver(() => {
+            node.scrollTop = node.scrollHeight;
+        });
+        observer.observe(node, { childList: true, subtree: true });
+        return {
+            destroy() { observer.disconnect(); }
+        };
+    }
+
+    function playMatchSound() {
+        const ctx = new AudioContext();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.setValueAtTime(440, ctx.currentTime);
+        o.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
+        g.gain.setValueAtTime(0.3, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        o.start(); o.stop(ctx.currentTime + 0.5);
+    }
+
+    function playMessageSound() {
+        const ctx = new AudioContext();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.setValueAtTime(880, ctx.currentTime);
+        g.gain.setValueAtTime(0.15, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+        o.start(); o.stop(ctx.currentTime + 0.2);
     }
 </script>
 
@@ -245,7 +281,7 @@
 
 
         <!-- Chat area -->
-        <div class="flex-1 p-6 overflow-y-auto flex flex-col gap-8" id="chatarea">
+        <div use:autoscroll class="flex-1 p-6 overflow-y-auto flex flex-col gap-8" id="chatarea">
 
         {#each messages as msg}
 

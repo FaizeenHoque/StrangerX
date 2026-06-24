@@ -54,6 +54,14 @@
   --tracking-hacker-micro: 1.5px; /*[cite: 1] */
 }
 
+* {
+    scrollbar-width: none; /* Firefox */
+}
+
+*::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}
+
 /* BASE APPLICATION OVERRIDES */
 @layer base {
   html, body {
